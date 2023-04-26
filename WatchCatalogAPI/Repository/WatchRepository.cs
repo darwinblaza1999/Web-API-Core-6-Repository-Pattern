@@ -4,6 +4,7 @@ using System.Data;
 using WatchCatalogAPI.Class;
 using WatchCatalogAPI.Model;
 using WatchCatalogAPI.Repository.Interface;
+using Newtonsoft.Json;
 
 namespace WatchCatalogAPI.Repository
 {
@@ -142,7 +143,7 @@ namespace WatchCatalogAPI.Repository
                     con.Open();
                     var result = await con.QueryAsync("usp_SelectItem", param, commandType: CommandType.StoredProcedure);
                     response.HttpCode = ResponseStatusCode.Success;
-                    response.Data = result;
+                    response.Data = result.FirstOrDefault();
                     response.Code = result.Any() ? ResponseCode.Success : ResponseCode.NotFound;
                     response.DeveloperMessage = result.Any() ? "Ok" : "No record Found";
                     con.Close();
@@ -163,17 +164,27 @@ namespace WatchCatalogAPI.Repository
             return response;
         }
 
-        public async Task<Response<object>> Update(WatchDetails details)
+        public async Task<Response<object>> Update(WatchDetails1 details)
         {
             var response = new Response<object>();
             try
             {
                 var param = new DynamicParameters();
-                var property = details.GetType().GetProperties();
-                foreach (var item in property)
-                {
-                    param.Add(item.Name, item.GetValue(details));
-                }
+                param.Add("@itemName", details.ItemName, DbType.String);
+                param.Add("@itemNo", details.ItemNo, DbType.Int32);
+                param.Add("@shortDescription", details.ShortDescription, DbType.String);
+                param.Add("@fullDescription", details.FullDescription, DbType.AnsiString);
+                param.Add("@price", details.Price, DbType.Decimal);
+                param.Add("@caliber", details.Caliber, DbType.String);
+                param.Add("@movement", details.Movement, DbType.String);
+                param.Add("@chronograph", details.Chronograph, DbType.String);
+                param.Add("@weight", details.Weight, DbType.String);
+                param.Add("@height", details.Height, DbType.String);
+                param.Add("@diameter", details.Diameter, DbType.String);
+                param.Add("@thickness", details.Thickness, DbType.String);
+                param.Add("@jewel", details.Jewel, DbType.Int32);
+                param.Add("@caseMaterial", details.CaseMaterial, DbType.String);
+                param.Add("@strapMaterial", details.StrapMaterial, DbType.String);
                 param.Add("retval", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 using (var con = this.connectionString.CreateConnectionCatalogDB())
                 {

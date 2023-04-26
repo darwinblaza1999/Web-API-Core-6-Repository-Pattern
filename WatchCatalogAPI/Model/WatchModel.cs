@@ -3,9 +3,9 @@
     public class WatchDetails
     {
         public  string? ItemName { get; set; }
-        public  int ItemNo { get; set; }
-        public  string? ShortDesc { get; set; }
-        public  string ?FullDesc { get; set; }
+        public string? Image { get; set; }
+        public  string? ShortDescription { get; set; }
+        public  string ?FullDescription { get; set; }
         public  decimal Price { get; set; }
         public  string? Caliber { get; set; }
         public  string? Movement { get; set; }
@@ -17,5 +17,9 @@
         public int Jewel { get; set; }
         public string? CaseMaterial { get; set; }
         public string? StrapMaterial { get; set; }
+    }
+    public class WatchDetails1:WatchDetails
+    {
+        public int ItemNo { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace WatchCatalogAPI.Controllers
         }
         [HttpPut]
         [Route("UpdateItem")]
-        public async Task<IActionResult> Update(WatchDetails details)
+        public async Task<IActionResult> Update(WatchDetails1 details)
         {
             var response = await _adapter.watch.Update(details);
             return StatusCode((int)response.HttpCode, response);
