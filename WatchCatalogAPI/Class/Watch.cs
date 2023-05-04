@@ -1,17 +1,18 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
 using System.Data;
-using WatchCatalogAPI.Class;
 using WatchCatalogAPI.Model;
 using WatchCatalogAPI.Repository.Interface;
 using Newtonsoft.Json;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
-namespace WatchCatalogAPI.Repository
+namespace WatchCatalogAPI.Class
 {
-    public class WatchRepository:IWatch
+    public class WatchRepository : IWatch
     {
-        private readonly Connection connectionString;
-        public WatchRepository(Connection connectionString) => this.connectionString = connectionString;
+        private readonly Connection _connectionString;
+        public WatchRepository(Connection connectionString) => _connectionString = connectionString;
 
         public async Task<Response<object>> Add(WatchDetails details)
         {
@@ -25,23 +26,23 @@ namespace WatchCatalogAPI.Repository
                     param.Add(item.Name, item.GetValue(details));
                 }
                 param.Add("retval", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                using (var con = this.connectionString.CreateConnectionCatalogDB())
+                using (var con = _connectionString.CreateConnectionCatalogDB())
                 {
                     con.Open();
                     response.Data = await con.QueryAsync("usp_AddItem", param, commandType: CommandType.StoredProcedure);
                     response.HttpCode = ResponseStatusCode.Success;
-                    if(param.Get<int>("retval") == 100) 
-                    { 
+                    if (param.Get<int>("retval") == 100)
+                    {
                         response.Code = ResponseCode.Success;
                         response.DeveloperMessage = "Success";
                     }
-                    else if(param.Get<int>("retval") == 2) 
-                    { 
+                    else if (param.Get<int>("retval") == 2)
+                    {
                         response.Code = ResponseCode.Duplicate;
-                        response.DeveloperMessage = "Already exists";
+                        response.DeveloperMessage = "Unable to save, Item name already exists.";
                     }
-                    else 
-                    { 
+                    else
+                    {
                         response.Code = ResponseCode.Default;
                         response.DeveloperMessage = "Failed";
                     }
@@ -70,14 +71,14 @@ namespace WatchCatalogAPI.Repository
             {
                 var param = new DynamicParameters();
                 param.Add("itemNo", id, dbType: DbType.Int32);
-                param.Add("retval", dbType: DbType.Int32, direction:ParameterDirection.Output);
-                using (var con = this.connectionString.CreateConnectionCatalogDB())
+                param.Add("retval", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                using (var con = _connectionString.CreateConnectionCatalogDB())
                 {
                     con.Open();
                     response.Data = await con.QueryAsync("usp_DeleteItem", param, commandType: CommandType.StoredProcedure);
                     response.HttpCode = ResponseStatusCode.Success;
-                    response.Code = param.Get<int>("retval") == 100 ? ResponseCode.Success : ResponseCode.Default;
-                    response.DeveloperMessage = param.Get<int>("retval") == 100 ? "Ok" : "Failed";
+                    response.Code = param.Get<int>("retval") == 100 ? ResponseCode.Success : param.Get<int>("retval");
+                    response.DeveloperMessage = param.Get<int>("retval") == 100 ? "Success" : "Failed";
                     con.Close();
                 }
             }
@@ -104,14 +105,14 @@ namespace WatchCatalogAPI.Repository
                 var param = new DynamicParameters();
                 param.Add("itemNo", 0, DbType.Int32);
                 param.Add("type", "", DbType.String);
-                using (var con = connectionString.CreateConnectionCatalogDB())
+                using (var con = _connectionString.CreateConnectionCatalogDB())
                 {
                     con.Open();
                     var result = await con.QueryAsync("usp_SelectItem", param, commandType: CommandType.StoredProcedure);
                     response.HttpCode = ResponseStatusCode.Success;
                     response.Data = result;
                     response.Code = result.Any() ? ResponseCode.Success : ResponseCode.NotFound;
-                    response.DeveloperMessage = result.Any() ? "Ok": "No record Found";
+                    response.DeveloperMessage = result.Any() ? "Ok" : "No record Found";
                     con.Close();
                 }
             }
@@ -138,7 +139,7 @@ namespace WatchCatalogAPI.Repository
                 var param = new DynamicParameters();
                 param.Add("itemNo", id, DbType.Int32);
                 param.Add("type", "BYID", DbType.String);
-                using (var con = connectionString.CreateConnectionCatalogDB())
+                using (var con = _connectionString.CreateConnectionCatalogDB())
                 {
                     con.Open();
                     var result = await con.QueryAsync("usp_SelectItem", param, commandType: CommandType.StoredProcedure);
@@ -178,34 +179,54 @@ namespace WatchCatalogAPI.Repository
                 param.Add("@caliber", details.Caliber, DbType.String);
                 param.Add("@movement", details.Movement, DbType.String);
                 param.Add("@chronograph", details.Chronograph, DbType.String);
-                param.Add("@weight", details.Weight, DbType.String);
-                param.Add("@height", details.Height, DbType.String);
+                param.Add("@weight", details.Weight, DbType.Decimal);
+                param.Add("@height", details.Height, DbType.Decimal);
                 param.Add("@diameter", details.Diameter, DbType.String);
-                param.Add("@thickness", details.Thickness, DbType.String);
+                param.Add("@thickness", details.Thickness, DbType.Decimal);
                 param.Add("@jewel", details.Jewel, DbType.Int32);
                 param.Add("@caseMaterial", details.CaseMaterial, DbType.String);
                 param.Add("@strapMaterial", details.StrapMaterial, DbType.String);
                 param.Add("retval", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                using (var con = this.connectionString.CreateConnectionCatalogDB())
+                using (var con = _connectionString.CreateConnectionCatalogDB())
                 {
                     con.Open();
                     response.Data = await con.ExecuteAsync("usp_UpdateItem", param, commandType: CommandType.StoredProcedure);
                     response.HttpCode = ResponseStatusCode.Success;
-                    if(param.Get<int>("retval") == 100) 
-                    { 
-                        response.Code = ResponseCode.Success;
-                        response.DeveloperMessage = "Success";
-                    }
-                    else if(param.Get<int>("retval") == -1) 
-                    {
-                        response.Code = ResponseCode.NotFound;
-                        response.DeveloperMessage = "Id not found";
-                    }
-                    else
-                    {
-                        response.Code = ResponseCode.Default;
-                        response.DeveloperMessage = "Failed";
-                    }
+                    response.Code = param.Get<int>("retval") == 100 ? ResponseCode.Success : param.Get<int>("retval");
+                    response.DeveloperMessage = param.Get<int>("retval") == 100 ? "Success" : "Failed";
+                    con.Close();
+                }
+            }
+            catch (SqlException sql)
+            {
+                response.HttpCode = ResponseStatusCode.InternalError;
+                response.Code = ResponseCode.SqlError;
+                response.DeveloperMessage = sql.Message;
+            }
+            catch (Exception ex)
+            {
+                response.HttpCode = ResponseStatusCode.BadRequest;
+                response.Code = ResponseCode.InternalException;
+                response.DeveloperMessage = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<Response<object>> UpdateImage(WatchImage model)
+        {
+            var response = new Response<object>();
+            try
+            {
+                var param = new DynamicParameters();
+                param.Add("itemno", model.ItemNo, DbType.Int32);
+                param.Add("image", model.Image, DbType.String);
+                param.Add("retval", DbType.Int32, direction:ParameterDirection.Output);
+                using (var con = _connectionString.CreateConnectionCatalogDB())
+                {
+                    con.Open();
+                    response.Data = await con.ExecuteAsync("usp_UpdateImage", param, commandType: CommandType.StoredProcedure);
+                    response.HttpCode = ResponseStatusCode.Success;
+                    response.Code = param.Get<int>("retval") == 100 ? ResponseCode.Success : param.Get<int>("retval");
                     response.DeveloperMessage = param.Get<int>("retval") == 100 ? "Success" : "Failed";
                     con.Close();
                 }

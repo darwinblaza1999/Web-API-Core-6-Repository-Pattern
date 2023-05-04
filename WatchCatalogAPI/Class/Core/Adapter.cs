@@ -10,10 +10,15 @@ namespace WatchCatalogAPI.Class.Core
         //public IGeneric<object> generic { get; }
 
         public IWatch watch { get; }
-        public Adapter(Connection con)
+        public IAuthManager authManager { get; }
+
+        public IBlob blob { get; }
+
+        public Adapter(Connection con, IConfiguration config)
         {
             watch = new WatchRepository(con);
-            //generic = new GenericRepository<object>(); 
+            authManager = new AuthManager(con, config);
+            blob = new Blob(con); 
         }
     }
 }

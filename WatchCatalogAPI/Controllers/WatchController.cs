@@ -7,7 +7,7 @@ namespace WatchCatalogAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class WatchController : ControllerBase
+    public class WatchController : BaseController
     {
         private readonly IAdapter _adapter;
         public WatchController(IAdapter adapter)
@@ -43,11 +43,18 @@ namespace WatchCatalogAPI.Controllers
             return StatusCode((int)response.HttpCode, response);
         }
         [HttpGet]
-        [Route("GetItemById/{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [Route("GetItemById/{ItemNo}")]
+        public async Task<IActionResult> GetById(int ItemNo)
         {
-            var response = await _adapter.watch.GetAsync(id);
+            var response = await _adapter.watch.GetAsync(ItemNo);
             return StatusCode((int)response.HttpCode, response);
         }
+        [HttpPut]
+        [Route("UpdateImage")]
+        public async Task<IActionResult> UpdateImage(WatchImage model)
+        {
+            var response = await _adapter.watch.UpdateImage(model);
+            return StatusCode((int)response.HttpCode,response);
+        }   
     }
 }

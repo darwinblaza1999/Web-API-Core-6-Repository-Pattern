@@ -34,4 +34,11 @@ namespace WatchCatalogAPI.Model
         InternalException = 98,
         ProcessException = 99,
     }
+    public class ServiceResponse<T>
+    {
+        public int code { get; set; }
+        public string? DeveloperMessage { get; set; }
+        public T? data { get; set; }
+        public string? token { get; set; }
+    }
 }

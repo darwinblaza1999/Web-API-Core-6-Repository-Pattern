@@ -9,6 +9,7 @@ namespace WatchCatalogAPI.Repository.Interface
         Task<Response<object>> Delete(int id);
         Task<Response<object>> GetAsync(int id);
         Task<Response<object>> GetAllAsync();
+        Task<Response<object>> UpdateImage(WatchImage model);
     }
 }
 
