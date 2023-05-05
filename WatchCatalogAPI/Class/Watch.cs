@@ -212,9 +212,9 @@ namespace WatchCatalogAPI.Class
             return response;
         }
 
-        public async Task<Response<object>> UpdateImage(WatchImage model)
+        public Response<WatchDetails1> UpdateImage(WatchImage model)
         {
-            var response = new Response<object>();
+            var response = new Response<WatchDetails1>();
             try
             {
                 var param = new DynamicParameters();
@@ -224,7 +224,7 @@ namespace WatchCatalogAPI.Class
                 using (var con = _connectionString.CreateConnectionCatalogDB())
                 {
                     con.Open();
-                    response.Data = await con.ExecuteAsync("usp_UpdateImage", param, commandType: CommandType.StoredProcedure);
+                    response.Data = con.Query<WatchDetails1>("usp_UpdateImage", param, commandType: CommandType.StoredProcedure).FirstOrDefault();
                     response.HttpCode = ResponseStatusCode.Success;
                     response.Code = param.Get<int>("retval") == 100 ? ResponseCode.Success : param.Get<int>("retval");
                     response.DeveloperMessage = param.Get<int>("retval") == 100 ? "Success" : "Failed";

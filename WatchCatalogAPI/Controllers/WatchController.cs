@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WatchCatalogAPI.DTO;
 using WatchCatalogAPI.Model;
 using WatchCatalogAPI.Repository.UnitofWork;
 
@@ -10,9 +12,11 @@ namespace WatchCatalogAPI.Controllers
     public class WatchController : BaseController
     {
         private readonly IAdapter _adapter;
-        public WatchController(IAdapter adapter)
+        private readonly IMapper _mapper;
+        public WatchController(IAdapter adapter, IMapper mapper)
         {
             _adapter = adapter;
+            _mapper = mapper;
         }
         [HttpPost]
         [Route("AddItem")]
@@ -51,10 +55,10 @@ namespace WatchCatalogAPI.Controllers
         }
         [HttpPut]
         [Route("UpdateImage")]
-        public async Task<IActionResult> UpdateImage(WatchImage model)
+        public IActionResult UpdateImage(WatchImage model)
         {
-            var response = await _adapter.watch.UpdateImage(model);
-            return StatusCode((int)response.HttpCode,response);
+            DTOResponse<DTOWatchModel> result = _mapper.Map<DTOResponse<DTOWatchModel>>(_adapter.watch.UpdateImage(model));
+            return StatusCode((int)result.HttpCode, result);
         }   
     }
 }

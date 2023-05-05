@@ -11,6 +11,7 @@ namespace WatchCatalogAPI.AutoMapper
             CreateMap(typeof(ServiceResponse<>), typeof(ResponseMessage<>));
             CreateMap(typeof(Response<>), typeof(DTOResponse<>));
             CreateMap<JWTAuthModel, DTOJwtAuthModel>();
+            CreateMap<WatchDetails1, DTOWatchModel>();
         }
     }
 }
