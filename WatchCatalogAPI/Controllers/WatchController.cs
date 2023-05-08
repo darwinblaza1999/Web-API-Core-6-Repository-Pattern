@@ -22,14 +22,14 @@ namespace WatchCatalogAPI.Controllers
         [Route("AddItem")]
         public async Task<IActionResult> Add(WatchDetails details)
         {
-            var response = await _adapter.watch.Add(details);
+            var response = await _adapter.watch.AddWatch(details);
             return StatusCode((int)response.HttpCode, response);
         }
         [HttpPut]
         [Route("UpdateItem")]
         public async Task<IActionResult> Update(WatchDetails1 details)
         {
-            var response = await _adapter.watch.Update(details);
+            var response = await _adapter.watch.UpdateWatch(details);
             return StatusCode((int)response.HttpCode, response);
         }
         [HttpDelete]
@@ -50,15 +50,16 @@ namespace WatchCatalogAPI.Controllers
         [Route("GetItemById/{ItemNo}")]
         public async Task<IActionResult> GetById(int ItemNo)
         {
-            var response = await _adapter.watch.GetAsync(ItemNo);
+            var response = await _adapter.watch.GetWatchById(ItemNo);
             return StatusCode((int)response.HttpCode, response);
         }
         [HttpPut]
         [Route("UpdateImage")]
-        public IActionResult UpdateImage(WatchImage model)
+        public async Task<IActionResult> UpdateImage(WatchImage model)
         {
-            DTOResponse<DTOWatchModel> result = _mapper.Map<DTOResponse<DTOWatchModel>>(_adapter.watch.UpdateImage(model));
-            return StatusCode((int)result.HttpCode, result);
+            var response = await _adapter.watch.UpdateWatchImage(model);
+            //DTOResponse<DTOWatchModel> result = _mapper.Map<DTOResponse<DTOWatchModel>>(_adapter.watch.UpdateWatchImage(model));
+            return StatusCode((int)response.HttpCode, response);
         }   
     }
 }
