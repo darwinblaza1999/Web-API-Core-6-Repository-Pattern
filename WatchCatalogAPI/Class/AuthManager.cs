@@ -13,11 +13,11 @@ namespace WatchCatalogAPI.Class
     public class AuthManager : IAuthManager
     {
         public readonly Connection _connection;
-        private readonly IConfiguration _configuration;
+        //private readonly IConfiguration _configuration;
         public AuthManager(Connection connection, IConfiguration configuration)
         {
             _connection = connection;
-            _configuration = configuration;
+            //_configuration = configuration;
         }
         public ServiceResponse<JWTAuthModel> Auth(JWTAuthModel auth)
         {
@@ -64,9 +64,9 @@ namespace WatchCatalogAPI.Class
             var response = new Response<string>();
             try
             {
-                var key = _configuration["AuthManager:Key"];
-                var issuer = _configuration["AuthManager:Issuer"];
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthManager:Key"]));
+                var key = _connection.CreateAuthKey();
+                var issuer = _connection.CreateAuthIssuer();
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_connection.CreateAuthKey()));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
                 //claim is used to add identity to JWT token
@@ -78,8 +78,8 @@ namespace WatchCatalogAPI.Class
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-                var token = new JwtSecurityToken(_configuration["AuthManager:Issuer"],
-                  _configuration["AuthManager:Issuer"],
+                var token = new JwtSecurityToken(_connection.CreateAuthIssuer(),
+                  _connection.CreateAuthIssuer(),
                   claims,
                   expires: DateTime.Now.AddMinutes(5),
                   signingCredentials: credentials);

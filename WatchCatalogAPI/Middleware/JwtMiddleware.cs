@@ -72,9 +72,9 @@ namespace WatchCatalogAPI.Middleware
                             ValidateAudience = true,
                             ValidateLifetime = false,
                             ValidateIssuerSigningKey = true,
-                            ValidIssuer = _configuration["AuthManager:Issuer"],
-                            ValidAudience = _configuration["AuthManager:Issuer"],
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthManager:Key"]))
+                            ValidIssuer = _configuration["AuthManagerIssuer"],
+                            ValidAudience = _configuration["AuthManagerIssuer"],
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AuthManagerKey"]))
                         }, out SecurityToken validatedToken);
 
                         var jwtToken = (JwtSecurityToken)validatedToken;

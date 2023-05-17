@@ -5,7 +5,9 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://secretkeyava.vault.azure.net/",
+        "AZURE_USERNAME": "darwin.yamyamin@accenture.com"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5126"
@@ -15,14 +17,20 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://secretkeyava.vault.azure.net/",
+        "AZURE_USERNAME": "darwin.yamyamin@accenture.com"
       }
     },
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
-      "publishAllPorts": true
+      "publishAllPorts": true,
+      "environmentVariables": {
+        "VaultUri": "https://secretkeyava.vault.azure.net/",
+        "AZURE_USERNAME": "darwin.yamyamin@accenture.com"
+      }
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json",

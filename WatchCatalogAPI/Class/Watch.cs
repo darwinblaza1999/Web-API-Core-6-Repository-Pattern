@@ -17,7 +17,7 @@ namespace WatchCatalogAPI.Class
 
         public async Task<Response<object>> AddWatch(WatchDetails details)
         {
-            return await AddAsync("usp_AddItem", details); ;
+            return await AddAsync("usp_AddItem", details);
         }
 
         public async Task<Response<object>> Delete(int id)
@@ -34,7 +34,7 @@ namespace WatchCatalogAPI.Class
         public async Task<Response<object>> GetWatchById(int id)
         {
             var wid = new WatchId { itemNo = id, };
-            return await GetByIdAsync("GetByid", wid);
+            return await GetByIdAsync("usp_GetById", wid);
         }
 
         public async Task<Response<object>> UpdateWatch(WatchDetails1 details)

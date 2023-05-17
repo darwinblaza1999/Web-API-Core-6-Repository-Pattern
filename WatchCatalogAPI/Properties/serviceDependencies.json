@@ -3,6 +3,10 @@
     "apis1": {
       "ignored": "true",
       "type": "apis.azure"
+    },
+    "secrets1": {
+      "type": "secrets",
+      "connectionId": "VaultUri"
     }
   }
 }

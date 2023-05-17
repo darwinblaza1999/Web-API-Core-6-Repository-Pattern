@@ -18,6 +18,7 @@ namespace WatchCatalogAPI.Controllers
             _adapter = adapter;
             _mapper = mapper;
         }
+
         [HttpPost("GetToken")]
         [AllowAnonymous]
         public IActionResult GetAccount(JWTAuthModel auth)

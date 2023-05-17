@@ -142,7 +142,7 @@ namespace WatchCatalogAPI.Repository
                 using (var con = _connection.CreateConnectionCatalogDB())
                 {
                     con.Open();
-                    var result = await con.QueryAsync("usp_GetById", param, commandType: CommandType.StoredProcedure);
+                    var result = await con.QueryAsync(sp, param, commandType: CommandType.StoredProcedure);
                     response.HttpCode = ResponseStatusCode.Success;
                     response.Data = result.FirstOrDefault();
                     response.Code = result.Any() ? ResponseCode.Success : ResponseCode.NotFound;

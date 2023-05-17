@@ -7,14 +7,26 @@ using WatchCatalogAPI.Class.Core;
 using WatchCatalogAPI.Middleware;
 using WatchCatalogAPI.Repository.Interface;
 using WatchCatalogAPI.Repository.UnitofWork;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
 
 var builder = WebApplication.CreateBuilder(args);
+
+/*Key Vault*/
+builder.Host.ConfigureAppConfiguration((context, config) =>
+{
+    var settings = config.Build();
+    var keyVaultUrl = settings["KeyVaultConfiguration:KeyVaultUrl"];
+    var keyVaultClientId = settings["KeyVaultConfiguration:ClientID"];
+    var keyVaultClientSecret = settings["KeyVaultConfiguration:ClientSecret"];
+    config.AddAzureKeyVault(keyVaultUrl, keyVaultClientId, keyVaultClientSecret, new DefaultKeyVaultSecretManager());
+});
 
 // Add services to the container.
 var provider = builder.Services.BuildServiceProvider();
 var configuration = provider.GetRequiredService<IConfiguration>();
 
-// Swagger authentication
+/* Swagger authentication */
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Watch Catalog API", Version = "v1" });
@@ -61,9 +73,9 @@ builder.Services.AddAuthentication(options =>
              ValidateAudience = true,
              ValidateLifetime = true,
              ValidateIssuerSigningKey = true,
-             ValidIssuer = configuration["AuthManager:Issuer"],
-             ValidAudience = configuration["AuthManager:Issuer"],
-             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["AuthManager:Key"]))
+             ValidIssuer = configuration["AuthManagerIssuer"],
+             ValidAudience = configuration["AuthManagerIssuer"],
+             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["AuthManagerKey"]))
          };
      });
 

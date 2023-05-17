@@ -17,6 +17,7 @@ namespace WatchCatalogAPI.Controllers
             _adapter = adapter;
             _mapper = mapper;
         }
+
         [HttpPost]
         [Route("UploadImage")]
         public async Task<IActionResult> UploadImage(IFormFile file)
